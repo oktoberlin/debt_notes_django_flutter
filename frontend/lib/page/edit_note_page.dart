@@ -6,6 +6,7 @@ import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'package:http/http.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import '../db/notes_database.dart';
 import '../model/note.dart';
 import '../widget/note_form_widget.dart';
@@ -26,44 +27,76 @@ class AddEditNotePage extends StatefulWidget {
 class _AddEditNotePageState extends State<AddEditNotePage> {
   final _formKey = GlobalKey<FormState>();
   late int id;
-  late bool isImportant;
-  late int number;
-  late String title;
+  late String theBorrower;
+  late String borrowerType;
+  late int nominal;
   late String description;
-  late DateTime createdTime;
-
+  late String dateBorrowed;
+  late String timeBorrowed;
+  final bool _isLoading = false;
   @override
   void initState() {
     super.initState();
     id = widget.note?.id ?? 0;
-    isImportant = widget.note?.isImportant ?? false;
-    number = widget.note?.number ?? 0;
-    title = widget.note?.title ?? '';
+    theBorrower = widget.note?.theBorrower ?? '';
+    borrowerType = widget.note?.borrowerType ?? 'Karyawan';
+    nominal = widget.note?.nominal ?? 0;
     description = widget.note?.description ?? '';
+    dateBorrowed = widget.note?.dateBorrowed ?? '';
+    timeBorrowed = widget.note?.timeBorrowed ?? '';
   }
 
   @override
   Widget build(BuildContext context) => Scaffold(
         appBar: AppBar(
-          actions: [buildButton()],
+          title: const Text('Create Note'),
         ),
-        body: Form(
-          key: _formKey,
-          child: NoteFormWidget(
-            isImportant: isImportant,
-            number: number,
-            title: title,
-            description: description,
-            onChangedImportant: (isImportant) =>
-                setState(() => this.isImportant = isImportant),
-            onChangedNumber: (number) => setState(() => this.number = number),
-            onChangedTitle: (title) => setState(() => this.title = title),
-            onChangedDescription: (description) =>
-                setState(() => this.description = description),
+        body: Center(
+          child: SingleChildScrollView(
+            child: Column(
+              key: _formKey,
+              children: [
+                NoteFormWidget(
+                  id: id,
+                  theBorrower: theBorrower,
+                  borrowerType: borrowerType,
+                  nominal: nominal,
+                  description: description,
+                  dateBorrowed: dateBorrowed,
+                  timeBorrowed: timeBorrowed,
+                  onChangedTheBorrower: (theBorrower) =>
+                      setState(() => this.theBorrower = theBorrower),
+                  onChangedBorrowerType: (borrowerType) =>
+                      setState(() => this.borrowerType = borrowerType),
+                  onChangedNominal: (nominal) =>
+                      setState(() => this.nominal = nominal),
+                  onChangedDescription: (description) =>
+                      setState(() => this.description = description),
+                  onChangedDateBorrowed: (dateBorrowed) =>
+                      setState(() => this.dateBorrowed = dateBorrowed),
+                  onChangedTimeBorrowed: (timeBorrowed) =>
+                      setState(() => this.timeBorrowed = timeBorrowed),
+                ),
+                const SizedBox(height: 15.0),
+                ElevatedButton.icon(
+                  icon: _isLoading
+                      ? const CircularProgressIndicator()
+                      : const Icon(Icons.post_add),
+                  label: Text(
+                    _isLoading ? '' : 'Create',
+                    style: const TextStyle(fontSize: 15),
+                  ),
+                  onPressed: addOrUpdateNote,
+                  style:
+                      ElevatedButton.styleFrom(fixedSize: const Size(150, 50)),
+                )
+              ],
+            ),
           ),
         ),
       );
 
+/*
   Widget buildButton() {
     final isFormValid = title.isNotEmpty && description.isNotEmpty;
 
@@ -79,29 +112,27 @@ class _AddEditNotePageState extends State<AddEditNotePage> {
       ),
     );
   }
-
+*/
   void addOrUpdateNote() async {
-    final isValid = _formKey.currentState!.validate();
+    final isUpdating = widget.note != null;
 
-    if (isValid) {
-      final isUpdating = widget.note != null;
-
-      if (isUpdating) {
-        await updateNote();
-      } else {
-        await addNote();
-      }
-
-      Navigator.of(context, rootNavigator: true).pop();
+    if (isUpdating) {
+      await updateNote();
+    } else {
+      await addNote();
     }
+
+    Navigator.of(context, rootNavigator: true).pop();
   }
 
   Future updateNote() async {
     final note = widget.note!.copy(
-      isImportant: isImportant,
-      number: number,
-      title: title,
+      theBorrower: theBorrower,
+      borrowerType: borrowerType,
+      nominal: nominal,
       description: description,
+      dateBorrowed: dateBorrowed,
+      timeBorrowed: timeBorrowed,
     );
 
     await NotesDatabase.instance.update(note);
@@ -109,10 +140,12 @@ class _AddEditNotePageState extends State<AddEditNotePage> {
       final result = await InternetAddress.lookup('google.com');
       if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
         final body = {
-          "isImportant": "${note.isImportant}",
-          "number": "${note.number}",
-          "title": note.title,
+          "theBorrower": note.theBorrower,
+          "borrowerType": note.borrowerType,
+          "nominal": "${note.nominal}",
           "description": note.description,
+          "date_borrowed": note.dateBorrowed,
+          "time_borrowed": note.timeBorrowed,
         };
 
         updateUrl(int ids) {
@@ -127,14 +160,21 @@ class _AddEditNotePageState extends State<AddEditNotePage> {
   }
 
   Future addNote() async {
-    DateTime date = DateTime.now();
+    DateTime now = DateTime.now();
+
+    String date = DateFormat('yyyy-MM-dd').format(now);
+
+    String time = DateFormat('HH:mm:ss').format(now);
+
     final note = Note(
-      title: title,
-      isImportant: true,
-      number: number,
+      theBorrower: theBorrower,
+      borrowerType: borrowerType,
+      nominal: nominal,
       description: description,
-      createdTime: date,
+      dateBorrowed: date.toString(),
+      timeBorrowed: time.toString(),
     );
+    print(note.theBorrower);
 
     await NotesDatabase.instance.create(note);
   }

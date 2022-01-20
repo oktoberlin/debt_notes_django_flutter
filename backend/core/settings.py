@@ -82,7 +82,7 @@ WSGI_APPLICATION = 'core.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'notes_api_sync',
+        'NAME': 'dkm_debt_notes',
         'USER': 'root',
         'PASSWORD': '',
         'HOST': 'localhost',

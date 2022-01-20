@@ -13,7 +13,7 @@ Future main() async {
 }
 
 class MyApp extends StatelessWidget {
-  static const String title = 'Notes SQLite';
+  static const String title = 'debt_notes_dkm';
 
   const MyApp({Key? key}) : super(key: key);
 
@@ -21,13 +21,12 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) => MaterialApp(
         debugShowCheckedModeBanner: false,
         title: title,
-        themeMode: ThemeMode.dark,
+        //themeMode: ThemeMode.light,
         theme: ThemeData(
-          primaryColor: Colors.black,
-          scaffoldBackgroundColor: Colors.blueGrey.shade900,
+          primarySwatch: Colors.blue,
           appBarTheme: const AppBarTheme(
-            backgroundColor: Colors.transparent,
-            elevation: 0,
+            //backgroundColor: Colors.transparent,
+            elevation: 2,
           ),
         ),
         home: const NotesPage(),

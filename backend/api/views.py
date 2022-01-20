@@ -32,13 +32,13 @@ def createNote(request):
     data = request.data
     note = Note.objects.create(
         id=data['id'],
-        isImportant=data['isImportant'],
-        number=data['number'],
-        title=data['title'],
+        theBorrower=data['theBorrower'],
+        borrowerType=data['borrowerType'],
+        nominal=data['nominal'],
         description=data['description'],
-        createdTime=data['createdTime'],
+        date_borrowed=data['date_borrowed'],
+        time_borrowed=data['time_borrowed'],
     )
-    print(data)
     serializer = NoteSerializer(note, many=False)
     return Response(serializer.data)
 

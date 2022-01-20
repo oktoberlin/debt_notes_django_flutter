@@ -12,7 +12,7 @@ class NotesDatabase {
   Future<Database> get database async {
     if (_database != null) return _database!;
 
-    _database = await _initDB('notes.db');
+    _database = await _initDB('dkm_debts_notes.db');
     return _database!;
   }
 
@@ -26,17 +26,17 @@ class NotesDatabase {
   Future _createDB(Database db, int version) async {
     const idType = 'INTEGER PRIMARY KEY AUTOINCREMENT';
     const textType = 'TEXT NOT NULL';
-    const boolType = 'BOOLEAN NOT NULL';
     const integerType = 'INTEGER NOT NULL';
 
     await db.execute('''
     CREATE TABLE $tableNotes ( 
       ${NoteFields.id} $idType, 
-      ${NoteFields.isImportant} $boolType,
-      ${NoteFields.number} $integerType,
-      ${NoteFields.title} $textType,
+      ${NoteFields.theBorrower} $textType,
+      ${NoteFields.borrowerType} $textType,
+      ${NoteFields.nominal} $integerType,
       ${NoteFields.description} $textType,
-      ${NoteFields.time} $textType
+      ${NoteFields.dateBorrowed} $textType,
+      ${NoteFields.timeBorrowed} $textType
       )
     ''');
   }
@@ -68,7 +68,7 @@ class NotesDatabase {
   Future<List<Note>> readAllNotes() async {
     final db = await instance.database;
 
-    const orderBy = '${NoteFields.time} ASC';
+    const orderBy = '${NoteFields.dateBorrowed} ASC';
 
     final result = await db.query(tableNotes, orderBy: orderBy);
 

@@ -58,21 +58,25 @@ class _NotesPageState extends State<NotesPage> {
         SELECT * FROM $tableNotes
         ''');
         final ok = dbSelect.toList();
+        //print(ok);
         List listId = [];
 
         for (var i = 0; i < ok.length; i++) {
-          String id = ok[i]['_id'].toString();
-          String title = ok[i]['title'].toString();
-          String isImportant = ok[i]['isImportant'].toString();
-          String number = ok[i]['number'].toString();
+          String id = ok[i]['id'].toString();
+          String theBorrower = ok[i]['theBorrower'].toString();
+          String borrowerType = ok[i]['borrowerType'].toString();
+          String nominal = ok[i]['nominal'].toString();
           String description = ok[i]['description'].toString();
-          String createdTime = ok[i]['time'].toString();
+          String dateBorrowed = ok[i]['dateBorrowed'].toString();
+          String timeBorrowed = ok[i]['timeBorrowed'].toString();
           if (responseList.contains(id)) {
             final body = {
-              "title": title,
-              "isImportant": isImportant,
-              "number": number,
+              "theBorrower": theBorrower,
+              "borrowerType": borrowerType,
+              "nominal": nominal,
               "description": description,
+              "date_borrowed": dateBorrowed,
+              "time_borrowed": timeBorrowed,
             };
             updateUrl(ids) {
               return 'http://192.168.0.194:8000/notes/$ids/update/';
@@ -99,12 +103,14 @@ class _NotesPageState extends State<NotesPage> {
 
           final body = {
             "id": id,
-            "title": title,
-            "isImportant": isImportant,
-            "number": number,
+            "theBorrower": theBorrower,
+            "borrowerType": borrowerType,
+            "nominal": nominal,
             "description": description,
-            "createdTime": createdTime,
+            "date_borrowed": dateBorrowed,
+            "time_borrowed": timeBorrowed,
           };
+          print('body : $theBorrower');
           await http.post(Uri.parse('http://192.168.0.194:8000/notes/create/'),
               body: body);
         }
@@ -118,8 +124,8 @@ class _NotesPageState extends State<NotesPage> {
   Widget build(BuildContext context) => Scaffold(
         appBar: AppBar(
           title: const Text(
-            'Notes',
-            style: TextStyle(fontSize: 24),
+            'DKM Debt Notes',
+            style: TextStyle(fontSize: 20),
           ),
           actions: const [Icon(Icons.search), SizedBox(width: 12)],
         ),
@@ -129,13 +135,13 @@ class _NotesPageState extends State<NotesPage> {
               : notes.isEmpty
                   ? const Text(
                       'No Notes',
-                      style: TextStyle(color: Colors.white, fontSize: 24),
+                      style: TextStyle(color: Colors.black, fontSize: 24),
                     )
                   : buildNotes(),
         ),
         floatingActionButton: FloatingActionButton(
-          backgroundColor: Colors.black,
-          child: const Icon(Icons.add),
+          //backgroundColor: Colors.black,
+          child: const Icon(Icons.person_add_alt_1_rounded),
           onPressed: () async {
             await Navigator.of(context).push(
               MaterialPageRoute(

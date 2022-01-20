@@ -1,26 +1,79 @@
+// ignore_for_file: avoid_print, duplicate_ignore
+
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:intl/intl.dart';
 
-class NoteFormWidget extends StatelessWidget {
-  final bool? isImportant;
-  final int? number;
-  final String? title;
+// ignore: must_be_immutable
+class NoteFormWidget extends StatefulWidget {
+  final int id;
+  final String? theBorrower;
+  final String? borrowerType;
+  final int? nominal;
   final String? description;
-  final ValueChanged<bool> onChangedImportant;
-  final ValueChanged<int> onChangedNumber;
-  final ValueChanged<String> onChangedTitle;
+  late String? dateBorrowed;
+  final String? timeBorrowed;
+  final ValueChanged<String> onChangedTheBorrower;
+  final ValueChanged<String> onChangedBorrowerType;
+  late final ValueChanged<int> onChangedNominal;
   final ValueChanged<String> onChangedDescription;
+  late ValueChanged<String> onChangedDateBorrowed;
+  final ValueChanged<String> onChangedTimeBorrowed;
 
-  const NoteFormWidget({
-    Key? key,
-    this.isImportant = false,
-    this.number = 0,
-    this.title = '',
-    this.description = '',
-    required this.onChangedImportant,
-    required this.onChangedNumber,
-    required this.onChangedTitle,
-    required this.onChangedDescription,
-  }) : super(key: key);
+  NoteFormWidget(
+      {Key? key,
+      required this.id,
+      this.theBorrower = '',
+      this.borrowerType = '',
+      this.nominal = 0,
+      this.description = '',
+      this.dateBorrowed = '',
+      this.timeBorrowed = '',
+      required this.onChangedTheBorrower,
+      required this.onChangedBorrowerType,
+      required this.onChangedNominal,
+      required this.onChangedDescription,
+      required this.onChangedDateBorrowed,
+      required this.onChangedTimeBorrowed})
+      : super(key: key);
+
+  @override
+  State<NoteFormWidget> createState() => _NoteFormWidgetState();
+}
+
+class _NoteFormWidgetState extends State<NoteFormWidget> {
+/*
+  @override
+  State<NoteFormWidget> createState() => _NoteFormWidgetState();
+}
+
+class _NoteFormWidgetState extends State<NoteFormWidget> {
+  /*
+  TextEditingController onChangedTheBorrower = TextEditingController();
+  late String onChangedBorrowerType = 'Karyawan';
+  TextEditingController onChangedNominal = TextEditingController();
+  TextEditingController onChangedDescription = TextEditingController();
+  TextEditingController onChangedDateBorrowed = TextEditingController();
+  TextEditingController onChangedTimeBorrowed = TextEditingController();
+  */
+  @override
+  void initState() {
+    /*
+    onChangedTheBorrower = TextEditingController(text: widget.theBorrower);
+    onChangedBorrowerType = widget.borrowerType!;
+    print(onChangedBorrowerType);
+    onChangedNominal = TextEditingController(text: widget.nominal.toString());
+    onChangedDescription = TextEditingController(text: widget.description);
+    onChangedDateBorrowed = TextEditingController(text: widget.dateBorrowed);
+    onChangedTimeBorrowed = TextEditingController(text: widget.timeBorrowed);
+    */
+    super.initState();
+  }
+*/
+  @override
+  void initState() {
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) => SingleChildScrollView(
@@ -29,62 +82,137 @@ class NoteFormWidget extends StatelessWidget {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Row(
-                children: [
-                  Switch(
-                    value: isImportant ?? false,
-                    onChanged: onChangedImportant,
-                  ),
-                  Expanded(
-                    child: Slider(
-                      value: (number ?? 0).toDouble(),
-                      min: 0,
-                      max: 5,
-                      divisions: 5,
-                      onChanged: (number) => onChangedNumber(number.toInt()),
+              TextFormField(
+                initialValue: widget.theBorrower,
+                decoration: const InputDecoration(
+                    icon: Icon(
+                      Icons.how_to_reg_rounded,
+                      color: Colors.blue,
                     ),
-                  )
-                ],
+                    labelText: "Enter Name"),
+                onChanged: widget.onChangedTheBorrower,
               ),
-              buildTitle(),
-              const SizedBox(height: 8),
-              buildDescription(),
-              const SizedBox(height: 16),
+              const SizedBox(height: 10.0),
+              Container(
+                padding: const EdgeInsets.only(
+                  left: 40,
+                ),
+                child: DropdownButton(
+                  value: widget.borrowerType,
+                  items: <String>[
+                    'Karyawan',
+                    'Non-Karyawan',
+                  ].map((String value) {
+                    return DropdownMenuItem<String>(
+                      child: Text(value),
+                      value: value,
+                    );
+                  }).toList(),
+                  onChanged: (value) {
+                    widget.onChangedBorrowerType(value as String);
+                  },
+                  hint: const Text("Select item"),
+                  disabledHint: const Text("Disabled"),
+                  elevation: 20,
+                  style: const TextStyle(color: Colors.green, fontSize: 16),
+                  icon: const Icon(Icons.arrow_drop_down_circle),
+                  iconDisabledColor: Colors.red,
+                  iconEnabledColor: Colors.green,
+                  isExpanded: true,
+                ),
+              ),
+              TextFormField(
+                initialValue: (widget.nominal).toString(),
+                keyboardType: TextInputType.number,
+                inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                decoration: const InputDecoration(
+                    icon: Icon(
+                      Icons.pin_outlined,
+                      color: Colors.blue,
+                    ),
+                    labelText: "Enter Nominal"),
+                onChanged: (number) => widget.onChangedNominal(number as int),
+                /*
+                  setState(() {
+                    widget.onChangedNominal = newValue! as ValueChanged<int?>;
+                  });*/
+              ),
+              const SizedBox(height: 10.0),
+              TextFormField(
+                initialValue: widget.description,
+                decoration: const InputDecoration(
+                    icon: Icon(
+                      Icons.text_fields_outlined,
+                      color: Colors.blue,
+                    ),
+                    labelText: "Deskripsi"),
+                onChanged: widget.onChangedDescription,
+              ),
+              TextFormField(
+                initialValue: widget.dateBorrowed,
+                decoration: const InputDecoration(
+                    icon: Icon(
+                      Icons.calendar_today,
+                      color: Colors.blue,
+                    ),
+                    labelText: "Enter Date"),
+                readOnly: true,
+                onTap: () async {
+                  DateTime? pickedDate = await showDatePicker(
+                      context: context,
+                      initialDate: DateTime.now(),
+                      firstDate: DateTime(2000),
+                      lastDate: DateTime(2101));
+
+                  if (pickedDate != null) {
+                    String formattedDate =
+                        DateFormat('yyyy-MM-dd').format(pickedDate);
+
+                    setState(() {
+                      widget.dateBorrowed = formattedDate;
+                    });
+                  } else {
+                    // ignore: avoid_print
+                    print("Date is not selected");
+                  }
+                },
+                onChanged: widget.onChangedDateBorrowed,
+              ),
+              TextFormField(
+                initialValue: widget.timeBorrowed,
+                decoration: const InputDecoration(
+                    icon: Icon(
+                      Icons.timer,
+                      color: Colors.blue,
+                    ),
+                    labelText: "Enter Time"),
+                readOnly: true,
+                onTap: () async {
+                  TimeOfDay? pickedTime = await showTimePicker(
+                    initialTime: TimeOfDay.now(),
+                    context: context,
+                  );
+
+                  if (pickedTime != null) {
+                    /*
+                    DateTime parsedTime = DateFormat.jm()
+                        .parse(pickedTime.format(context).toString());
+
+                    String formattedTime =
+                        DateFormat('HH:mm:ss').format(parsedTime);
+                    setState(() {
+                      widget.onChangedTimeBorrowed =
+                          formattedTime as ValueChanged<String>;
+                    });*/
+                  } else {
+                    // ignore: avoid_print
+                    print("Time is not selected");
+                  }
+                },
+                onChanged: widget.onChangedTimeBorrowed,
+              ),
             ],
           ),
         ),
-      );
-
-  Widget buildTitle() => TextFormField(
-        maxLines: 1,
-        initialValue: title,
-        style: const TextStyle(
-          color: Colors.white70,
-          fontWeight: FontWeight.bold,
-          fontSize: 24,
-        ),
-        decoration: const InputDecoration(
-          border: InputBorder.none,
-          hintText: 'Title',
-          hintStyle: TextStyle(color: Colors.white70),
-        ),
-        validator: (title) =>
-            title != null && title.isEmpty ? 'The title cannot be empty' : null,
-        onChanged: onChangedTitle,
-      );
-
-  Widget buildDescription() => TextFormField(
-        maxLines: 5,
-        initialValue: description,
-        style: const TextStyle(color: Colors.white60, fontSize: 18),
-        decoration: const InputDecoration(
-          border: InputBorder.none,
-          hintText: 'Type something...',
-          hintStyle: TextStyle(color: Colors.white60),
-        ),
-        validator: (title) => title != null && title.isEmpty
-            ? 'The description cannot be empty'
-            : null,
-        onChanged: onChangedDescription,
       );
 }
